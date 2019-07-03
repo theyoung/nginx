@@ -1,30 +1,23 @@
-#
-# Nginx Dockerfile
-#
-# https://github.com/dockerfile/nginx
-#
+#어떤 이미지로부터 새로운 이미지를 생성할지를 지정
+FROM node:6.2.2
 
-# Pull base image.
-FROM ubuntu:12.04
+#Dockerfile 을 생성/관리하는 사람
+MAINTAINER Jaeha Ahn <eu81273@gmail.com>
 
-# Install Nginx.
-RUN \
-  add-apt-repository -y ppa:nginx/stable && \
-  apt-get update && \
-  apt-get install -y nginx && \
-  rm -rf /var/lib/apt/lists/* && \
-  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
-  chown -R www-data:www-data /var/lib/nginx
+# /app 디렉토리 생성
+RUN mkdir -p /app
+# /app 디렉토리를 WORKDIR 로 설정
+WORKDIR /app
+# 현재 Dockerfile 있는 경로의 모든 파일을 /app 에 복사
+ADD . /app
+# npm install 을 실행
+RUN npm install
 
-# Define mountable directories.
-VOLUME ["/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/var/log/nginx", "/var/www/html"]
+#환경변수 NODE_ENV 의 값을 development 로 설정
+ENV NODE_ENV development
 
-# Define working directory.
-WORKDIR /etc/nginx
+#가상 머신에 오픈할 포트
+EXPOSE 3000 80
 
-# Define default command.
-CMD ["nginx"]
-
-# Expose ports.
-EXPOSE 80
-EXPOSE 443
+#컨테이너에서 실행될 명령을 지정
+CMD ["npm", "start"]
